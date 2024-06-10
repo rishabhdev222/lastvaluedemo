@@ -1,0 +1,46 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model FinancialInstrument {
+  createdAt    DateTime      @default(now())
+  id           String        @id @default(cuid())
+  priceRecords PriceRecord[]
+  updatedAt    DateTime      @updatedAt
+}
+
+model PriceRecord {
+  asOf                  DateTime?
+  createdAt             DateTime             @default(now())
+  financialInstrument   FinancialInstrument? @relation(fields: [financialInstrumentId], references: [id])
+  financialInstrumentId String?
+  id                    String               @id @default(cuid())
+  payload               Json?
+  updatedAt             DateTime             @updatedAt
+}
+
+model BatchRunRecord {
+  batchRun    BatchRun? @relation(fields: [batchRunId], references: [id])
+  batchRunId  String?
+  createdAt   DateTime  @default(now())
+  id          String    @id @default(cuid())
+  priceRecord Json?
+  updatedAt   DateTime  @updatedAt
+}
+
+model BatchRun {
+  batchRunRecords BatchRunRecord[]
+  createdAt       DateTime            @default(now())
+  id              String              @id @default(cuid())
+  status          EnumBatchRunStatus?
+  updatedAt       DateTime            @updatedAt
+}
+
+enum EnumBatchRunStatus {
+  Option1
+}
